@@ -52,7 +52,8 @@ class AdapterTests(unittest.TestCase):
 
 
 @unittest.skipUnless(
-    importlib.util.find_spec("langchain_core"), "Install public-docs example requirements"
+    all(importlib.util.find_spec(name) for name in ("langchain_core", "rank_bm25")),
+    "Install public-docs example requirements",
 )
 class PublicDocsIntegrationTests(unittest.TestCase):
     def test_actual_langchain_chain_detects_scope_regression_and_fix(self):
