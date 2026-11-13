@@ -1,0 +1,4 @@
+# Optional example dependencies; the retrieval-diff core remains dependency-free.
+langchain-core==1.8.0
+rank-bm25==0.2.2
+numpy==2.5.4

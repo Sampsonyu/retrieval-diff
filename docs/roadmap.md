@@ -8,12 +8,18 @@
 - Offline interactive HTML, JSON, Markdown, and CLI quality-gate exit codes.
 - Reproducible synthetic BM25 example with offsetting improvement/regression.
 
+## Added: public-document integration and trial preparation
+
+- Executed LangChain retrieval chain over pinned, licensed FastAPI documents.
+- Explicit document adapter and regression/fix integration checks.
+- Public interactive reports and a source-backed case study.
+- English launch drafts, a trial feedback form, and an empty feedback tracker.
+
 ## Next: demonstrate independent utility
 
-- Test capture in one actual RAG application using a public or permissioned corpus.
-- Publish installable source and an example report after reviewing the artifact.
 - Gather integration friction and repeated-use feedback from English-speaking users.
-- Add one requested integration rather than claiming support for every framework.
+- Validate capture in an external user's actual application; no trials have yet been claimed.
+- Improve the integration based on observed feedback.
 
 ## Later, conditional on demand
 

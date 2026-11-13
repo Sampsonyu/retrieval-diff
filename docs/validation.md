@@ -1,5 +1,24 @@
 # First-version validation
 
+## Public-document integration update
+
+The optional LangChain/BM25 example executes against 12 pinned, licensed FastAPI
+source documents (144 chunks, eight authored questions). A deliberately narrowed
+path filter causes two per-query source regressions; restoring scope removes
+both. The expanded local suite passes 31 tests with the optional example
+dependencies installed. The framework-free suite skips that integration test.
+
+The public demo is deployed at https://retrieval-diff-demo.sampsonyu.chatgpt.site.
+Static internal links and measurement substitutions were checked. The native
+Sites service confirmed publication with public access. The managed preview relay
+failed to start, so hosted-page browser QA is not claimed. This is not evidence
+of external users or a production incident.
+An additional direct HTTP probe from the Cloud executor received Cloudflare
+403/1010; the Sites control plane still confirms an active public deployment.
+Anonymous browser access from an independent device has not been verified here.
+
+## Original core validation
+
 Date: 2026-11-13. Local environment: Linux, CPython 3.12.14.
 
 ## Verified

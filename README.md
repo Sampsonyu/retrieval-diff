@@ -4,16 +4,21 @@
 
 **Find the recorded stage where your RAG evidence disappeared.**
 
+**[Try the public interactive demo](https://retrieval-diff-demo.sampsonyu.chatgpt.site)** ·
+[Public-document case study](docs/case-study.md) ·
+[Share trial feedback](https://github.com/Sampsonyu/retrieval-diff/issues/new?template=trial-feedback.yml)
+
 Compare two retrieval runs, inspect the search → filter → context funnel, and
 export an interactive HTML report that opens locally. No API keys, model calls,
 database, or runtime dependencies.
 
 ![Interactive evidence review](docs/assets/report-desktop.png)
 
-Status: **working first version, seeking real-world validation**. The included
-demo is synthetic. Adoption, production reliability, and performance on your
-workload have not been established. The distribution name is provisional; this
-project is not published on PyPI.
+Status: **early working version, seeking independent trials**. The public demo
+includes an executed LangChain retrieval chain on pinned FastAPI documentation
+and a separate synthetic example. Both regressions are deliberately introduced.
+External adoption, production reliability, and performance on your workload have
+not been established. This project is not published on PyPI.
 
 ## The problem
 
@@ -32,6 +37,12 @@ Retrieval Diff makes the recorded evidence reviewable:
   means the cause is unknown. Document presence does not prove answer correctness.
 
 ## Run the demo
+
+To explore without installation, open the [public demo](https://retrieval-diff-demo.sampsonyu.chatgpt.site).
+The [LangChain/FastAPI example](examples/fastapi_docs/README.md) includes pinned
+source documents, checksums, labels, optional dependency pins, and a corrected run.
+
+The following smaller synthetic example uses only the Python standard library.
 
 Python 3.10+; install from this checkout:
 
@@ -106,7 +117,9 @@ retrieval-diff compare baseline.json candidate.json --k 5 --html report.html
 
 You can also create the [versioned JSON contract](docs/input-format.md) directly.
 The Python API is `compare(Snapshot.load("baseline.json"), Snapshot.load("candidate.json"))`.
-There are no framework-specific adapters in this version.
+For LangChain-style documents, `retrieval_diff.adapters.hits_from_documents`
+maps explicit source/chunk metadata into hits without importing the framework.
+See the [executed LangChain example](examples/fastapi_docs/README.md).
 
 ## Gates and interpretation
 

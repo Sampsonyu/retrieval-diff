@@ -25,8 +25,13 @@ docs/validation.md describes the checks completed in the development environment
 
 ## Next product milestone
 
-Validate recording against one actual RAG application using a public or
-permissioned corpus. Measure setup friction and whether the stage report reveals
-a useful issue. Add integrations or scale features only when evidence supports
-the work. Preserve the distinction between observation, labeled quality, and
-unknown causes. All repository-facing content stays in English.
+The public-document LangChain example and public interactive demo are complete.
+See examples/fastapi_docs/README.md, docs/case-study.md, and web/README.md for
+reproduction and hosting identity. Launch materials in docs/launch are drafts,
+not sent messages. No external trial or adoption is claimed.
+
+Next, obtain independent trial feedback on setup friction and usefulness. External
+platform posts and invitations require a specific user instruction and known
+channel/account; do not infer posting authorization from drafting authorization.
+Preserve the distinction between observation, labeled quality, and unknown causes.
+All repository-facing content stays in English.

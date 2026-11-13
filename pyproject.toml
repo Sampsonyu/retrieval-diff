@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "retrieval-diff"
-version = "0.1.0"
+version = "0.2.0"
 description = "Find the recorded stage where RAG evidence disappeared."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -29,3 +29,4 @@ retrieval_diff = ["report.html"]
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+extend-exclude = ["examples/fastapi_docs/corpus"]

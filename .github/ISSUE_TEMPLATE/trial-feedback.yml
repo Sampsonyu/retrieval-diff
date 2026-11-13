@@ -1,0 +1,29 @@
+name: Trial feedback
+description: Tell us whether the report helped investigate your retrieval change.
+title: '[Trial feedback] '
+body:
+  - type: markdown
+    attributes:
+      value: 'Please share anonymized findings only. Query text, document excerpts, credentials, and private traces are not required.'
+  - type: input
+    id: setup
+    attributes:
+      label: What retrieval stack did you try?
+      placeholder: Framework, retriever, and approximate number of test queries
+  - type: textarea
+    id: friction
+    attributes:
+      label: Where did setup or recording become difficult?
+    validations:
+      required: true
+  - type: textarea
+    id: finding
+    attributes:
+      label: Did the report reveal anything useful?
+      description: A helpful finding, a misleading diagnosis, or no added value are all useful feedback.
+    validations:
+      required: true
+  - type: textarea
+    id: repeat
+    attributes:
+      label: Would you run it again? What would need to change?

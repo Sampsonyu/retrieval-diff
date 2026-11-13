@@ -1,0 +1,10 @@
+[
+  {"query_id":"background-email","query":"How can I send an email notification in the background after returning a response?","relevant_document_ids":["docs/en/docs/tutorial/background-tasks.md"],"evidence_quote":"You can define background tasks to be run *after* returning a response."},
+  {"query_id":"cors-credentials","query":"Can allow_origins use a wildcard when allow_credentials is true?","relevant_document_ids":["docs/en/docs/tutorial/cors.md"],"evidence_quote":"None of `allow_origins`, `allow_methods` and `allow_headers` can be set to `['*']` if `allow_credentials` is set to `True`."},
+  {"query_id":"http-exception","query":"How do I raise HTTPException for a missing item?","relevant_document_ids":["docs/en/docs/tutorial/handling-errors.md"],"evidence_quote":"HTTPException"},
+  {"query_id":"request-middleware","query":"How can middleware measure request processing time and add a custom response header?","relevant_document_ids":["docs/en/docs/tutorial/middleware.md"],"evidence_quote":"middleware"},
+  {"query_id":"dependencies","query":"How do I declare a dependency with Depends?","relevant_document_ids":["docs/en/docs/tutorial/dependencies/index.md"],"evidence_quote":"Depends"},
+  {"query_id":"websocket-text","query":"How do I accept a WebSocket connection and receive text messages?","relevant_document_ids":["docs/en/docs/advanced/websockets.md"],"evidence_quote":"WebSocket"},
+  {"query_id":"application-lifespan","query":"How should lifespan handle startup and shutdown logic?","relevant_document_ids":["docs/en/docs/advanced/events.md"],"evidence_quote":"lifespan"},
+  {"query_id":"form-and-json","query":"Can a request combine File and Form fields with a JSON Body?","relevant_document_ids":["docs/en/docs/tutorial/request-forms-and-files.md"],"evidence_quote":"you can't also declare `Body` fields that you expect to receive as JSON"}
+]
