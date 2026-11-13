@@ -68,6 +68,13 @@ def main() -> None:
         page.set_viewport_size({"width": 390, "height": 844})
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
         page.screenshot(path=str(artifacts / "report-mobile.png"), full_page=True)
+        for width in (320, 390):
+            page.set_viewport_size({"width": width, "height": 844})
+            for font in ("monospace", "Arial, sans-serif", "system-ui, sans-serif"):
+                page.evaluate("font => document.body.style.fontFamily = font", font)
+                assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), (
+                    f"Horizontal overflow at width={width}, font={font}"
+                )
         page = browser.new_page()
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.on(

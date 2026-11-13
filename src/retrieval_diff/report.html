@@ -323,7 +323,7 @@
           padding: 24px 16px 50px;
         }
         .stats {
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         }
         .columns {
           grid-template-columns: 1fr;
@@ -346,6 +346,11 @@
         }
         .top {
           align-items: flex-start;
+          flex-wrap: wrap;
+        }
+        .badge {
+          max-width: 100%;
+          white-space: normal;
         }
       }
     </style>
