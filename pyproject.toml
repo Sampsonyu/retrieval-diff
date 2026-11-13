@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "retrieval-diff"
+version = "0.1.0"
+description = "Find the recorded stage where RAG evidence disappeared."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{name = "Sampson Yu"}]
+dependencies = []
+keywords = ["rag", "retrieval", "debugging", "regression", "evaluation"]
+
+[project.scripts]
+retrieval-diff = "retrieval_diff.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+retrieval_diff = ["report.html"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

@@ -1,0 +1,58 @@
+name: Test and build
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -e . ruff build
+      - run: ruff check . && ruff format --check .
+      - run: python -m unittest discover -s tests -v
+      - run: python examples/build_demo.py
+      - name: Verify the demo detects the known regression
+        shell: bash
+        run: |
+          set +e
+          retrieval-diff compare artifacts/demo/baseline.json artifacts/demo/candidate.json --k 1 --require-labels --html artifacts/demo/report.html --json artifacts/demo/report.json
+          result=$?
+          set -e
+          test "$result" -eq 1
+          python -c "import json; r=json.load(open('artifacts/demo/report.json')); assert r['summary']['regressed']==1; assert r['summary']['improved']==1"
+      - run: python -m build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: demo-python-${{ matrix.python-version }}
+          path: artifacts/demo/
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e . playwright
+      - run: python -m playwright install --with-deps chromium
+      - run: python examples/build_demo.py
+      - name: Generate the known-regression report
+        shell: bash
+        run: |
+          set +e
+          retrieval-diff compare artifacts/demo/baseline.json artifacts/demo/candidate.json --k 1 --require-labels --html artifacts/demo/report.html
+          result=$?
+          set -e
+          test "$result" -eq 1
+      - run: python tests/browser_smoke.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: browser-screenshots
+          path: artifacts/demo/*.png
