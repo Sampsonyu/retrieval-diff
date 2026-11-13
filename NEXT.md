@@ -15,22 +15,13 @@ The first implementation, documentation, tests, demo, screenshots, and packaging
 are complete locally. Current validation is in docs/validation.md. No real-world
 adoption or production-readiness claim is authorized by this evidence.
 
-## Publishing blocker
+## Repository and validation
 
-Target account verified as Sampsonyu, ID 18622329. Target repository:
-`Sampsonyu/retrieval-diff`. The account connector and gh use the expected identity.
-
-- `gh repo create ...` returned GraphQL `Resource not accessible by integration`.
-- `POST /user/repos` returned HTTP 403 `Resource not accessible by integration`.
-- Cloud browser initialization failed with `the gaas-browser node_repl sandbox
-  cannot be disabled`. No browser action or repository creation succeeded.
-- The user has been asked to create an empty Public repository without an initial
-  README and reply when ready. No push has occurred. Do not claim a published URL.
-
-When the repository exists: verify the owner/name and that no unrelated content
-will be overwritten, configure origin, push the existing main branch, and inspect
-CI. Do not force-push over user changes. The user has already asked us to choose
-and implement this first original project; no need to re-ask which project.
+Repository: https://github.com/Sampsonyu/retrieval-diff.
+The initial owner-created repository was verified empty before the first push.
+GitHub Actions tests Python 3.10, 3.12, and 3.13, builds distributions, and runs
+Chromium report checks. Consult the workflow runs for hosted validation results;
+docs/validation.md describes the checks completed in the development environment.
 
 ## Next product milestone
 

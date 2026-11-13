@@ -1,5 +1,7 @@
 # Retrieval Diff
 
+[![Test and build](https://github.com/Sampsonyu/retrieval-diff/actions/workflows/ci.yml/badge.svg)](https://github.com/Sampsonyu/retrieval-diff/actions/workflows/ci.yml)
+
 **Find the recorded stage where your RAG evidence disappeared.**
 
 Compare two retrieval runs, inspect the search → filter → context funnel, and
@@ -34,6 +36,8 @@ Retrieval Diff makes the recorded evidence reviewable:
 Python 3.10+; install from this checkout:
 
 ```sh
+git clone https://github.com/Sampsonyu/retrieval-diff.git
+cd retrieval-diff
 python -m venv .venv
 . .venv/bin/activate
 python -m pip install -e .

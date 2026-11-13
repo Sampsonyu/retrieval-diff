@@ -13,6 +13,10 @@ authors = [{name = "Sampson Yu"}]
 dependencies = []
 keywords = ["rag", "retrieval", "debugging", "regression", "evaluation"]
 
+[project.urls]
+Repository = "https://github.com/Sampsonyu/retrieval-diff"
+Issues = "https://github.com/Sampsonyu/retrieval-diff/issues"
+
 [project.scripts]
 retrieval-diff = "retrieval_diff.cli:main"
 

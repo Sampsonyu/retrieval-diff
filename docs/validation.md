@@ -29,8 +29,9 @@ Date: 2026-11-13. Local environment: Linux, CPython 3.12.14.
 - Correctness of document relevance labels or instrumentation supplied by callers.
 - Passage relevance, answer correctness, or causal model attribution.
 - Large-trace performance, statistical significance, or changed-corpus evaluation.
-- Python 3.10/3.13 execution or GitHub-hosted CI results: the matrix is configured
-  but has not run while repository creation is blocked by account permissions.
+- This document records local Python 3.12 validation. For Python 3.10/3.13 and
+  GitHub-hosted browser/build results, see the repository's
+  [workflow runs](https://github.com/Sampsonyu/retrieval-diff/actions/workflows/ci.yml).
 
 The evidence supports a working first version and a reproducible debugging
 mechanism. It does not establish product-market fit or production maturity.
