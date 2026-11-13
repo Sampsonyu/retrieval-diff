@@ -225,6 +225,10 @@ class ContractTests(unittest.TestCase):
             run.save(path)
             self.assertEqual(Snapshot.load(path), run.snapshot())
 
+    def test_python_dictionary_round_trip_uses_json_arrays(self):
+        original = snapshot()
+        self.assertEqual(Snapshot.from_dict(original.to_dict()), original)
+
     def test_duplicate_json_fields_are_rejected(self):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "bad.json"

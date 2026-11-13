@@ -1,51 +1,634 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
-<title>Retrieval Diff — Evidence review</title>
-<style>
-:root{color-scheme:dark;--bg:#101412;--panel:#181e1a;--line:#303d33;--muted:#a5b4aa;--text:#eaf0eb;--green:#b3ed9d;--red:#ffac9a;--blue:#a7cfff}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,sans-serif}main{max-width:1260px;margin:auto;padding:38px 32px 70px}a{color:var(--green)}.top{display:flex;justify-content:space-between;align-items:center;gap:14px}.brand{font-size:14px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}.brand span{color:var(--green)}.badge{border:1px solid var(--line);border-radius:20px;padding:5px 12px;font-size:12px;white-space:nowrap;color:var(--muted)}h1{font-size:clamp(32px,5vw,52px);letter-spacing:-.045em;line-height:1.13;margin:44px 0 14px;font-weight:600}p{color:var(--muted);margin:6px 0 20px}.run{font-family:ui-monospace,monospace;font-size:13px;overflow-wrap:anywhere}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:30px 0}.stat{padding:18px 22px;border:1px solid var(--line);background:var(--panel);border-radius:12px}.stat strong{display:block;font-size:32px;font-weight:550;line-height:1.3}.stat label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}.regressed{color:var(--red)}.improved{color:var(--green)}.controls{display:flex;gap:12px;justify-content:space-between;margin:32px 0 16px}.tabs{display:flex;gap:6px;flex-wrap:wrap}button,input,select{font:inherit;border:1px solid var(--line);color:var(--text);background:var(--panel);border-radius:7px;padding:8px 12px}button{cursor:pointer}button[aria-pressed=true]{background:var(--green);color:#172115;border-color:var(--green)}button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:3px}input{width:280px;max-width:100%}.query{border:1px solid var(--line);border-radius:12px;margin:12px 0;background:var(--panel);overflow:hidden}.query>summary{padding:18px 20px;cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:18px}.query>summary::-webkit-details-marker{display:none}.query>summary:after{content:'+';color:var(--muted)}.query[open]>summary:after{content:'−'}.qheading{flex:1;min-width:0}.qid{font:12px ui-monospace,monospace;color:var(--muted)}.qtitle{font-size:16px;overflow-wrap:anywhere}.pill{font-size:11px;text-transform:uppercase;letter-spacing:.06em;border:1px solid var(--line);border-radius:4px;padding:3px 7px;white-space:nowrap}.body{padding:0 20px 24px;border-top:1px solid var(--line)}.columns{display:grid;grid-template-columns:1fr 1fr;gap:20px}.section-label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:22px 0 10px}.metric{font:13px ui-monospace,monospace;color:var(--muted);margin:8px 0}.funnel{display:flex;gap:6px;flex-wrap:wrap}.stage{border:1px solid var(--line);border-radius:6px;padding:7px 10px;font-size:12px}.stage b{color:var(--green);margin-left:6px}.diagnosis{border-left:2px solid var(--red);padding:8px 14px;margin:12px 0;background:#211e19}.diagnosis code{color:var(--text);overflow-wrap:anywhere}.diagnosis p{font-size:13px;margin:4px 0}.reason{font:12px ui-monospace,monospace;color:var(--red);overflow-wrap:anywhere}.hit{padding:12px 0;border-bottom:1px solid var(--line)}.hit code{font-size:12px;overflow-wrap:anywhere}.hit small{color:var(--muted);margin-left:8px}.hit p{font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere;margin:7px 0}.lost{color:var(--red)}.gained{color:var(--green)}.notes{border-top:1px solid var(--line);margin-top:34px;padding-top:20px;font-size:12px;color:var(--muted)}.notes li{margin:8px 0}.empty{text-align:center;padding:36px;color:var(--muted)}.config{font:12px ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere}.selected-stage{margin-top:18px;width:100%}.explanation{font-size:13px}.aggregate{border:1px solid var(--line);border-radius:8px;padding:12px 16px;color:var(--muted);font-size:13px}.aggregate b{color:var(--text)}@media(max-width:720px){main{padding:24px 16px 50px}.stats{grid-template-columns:1fr 1fr}.columns{grid-template-columns:1fr}.controls{flex-direction:column}.query>summary{padding:15px 12px;gap:8px}.body{padding:0 12px 18px}h1{margin-top:32px}.pill{font-size:9px}.top{align-items:flex-start}}
-</style>
-</head>
-<body>
-<main>
-<div class="top"><div class="brand"><span>↳</span> Retrieval Diff</div><div class="badge">LOCAL REPORT · NO EXTERNAL ASSETS</div></div>
-<h1>What changed.<br>Where evidence disappeared.</h1>
-<p>Review retrieval changes before they reach your users.</p>
-<div class="run" id="runs"></div>
-<div class="stats" id="stats"></div>
-<div class="aggregate" id="aggregate"></div>
-<div class="controls"><div class="tabs" role="group" aria-label="Filter queries"><button data-filter="all" aria-pressed="true">All queries</button><button data-filter="regressed" aria-pressed="false">Regressions</button><button data-filter="improved" aria-pressed="false">Improvements</button><button data-filter="changed" aria-pressed="false">Source changes</button></div><input type="search" id="search" aria-label="Search queries" placeholder="Search queries or sources…"></div>
-<div id="count" class="qid" aria-live="polite"></div>
-<section id="queries" aria-label="Query comparisons"></section>
-<details class="notes"><summary>Run configuration</summary><div class="columns"><pre class="config" id="baseline-config"></pre><pre class="config" id="candidate-config"></pre></div></details>
-<footer class="notes"><b>Read the evidence, not just the score.</b><ul id="warnings"></ul><p id="policy"></p><p>Scores are displayed as recorded; scores from different models or stages are not assumed comparable. Stage lists must contain complete observed results for the stages you record. This file includes the query text and recorded excerpts.</p></footer>
-</main>
-<script type="application/json" id="report-data">__REPORT_DATA__</script>
-<script>
-'use strict';
-const report=JSON.parse(document.getElementById('report-data').textContent);
-const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n};
-const byId=id=>document.getElementById(id);
-const fmt=n=>n===null||n===undefined?'unlabeled':n.toFixed(3);
-const sum=report.summary;
-byId('runs').textContent=report.baseline_run_id+' → '+report.candidate_run_id+'  /  '+report.dataset_id;
-for(const [value,label,cls] of [[sum.queries,'Queries reviewed',''],[sum.regressed,'Regressions','regressed'],[sum.improved,'Improvements','improved'],[sum.gate.toUpperCase(),'Labeled quality gate',sum.gate==='fail'?'regressed':'']]){const box=el('div','stat');box.append(el('strong',cls,String(value)),el('label','',label));byId('stats').append(box)}
-const agg=report.aggregate;
-byId('aggregate').textContent='Mean document recall: '+fmt(agg.baseline?.document_recall)+' → '+fmt(agg.candidate?.document_recall)+' · '+sum.labeled+'/'+sum.queries+' queries labeled. Individual regressions are checked separately.';
-byId('baseline-config').textContent='BASELINE\n'+JSON.stringify(report.config.baseline,null,2);
-byId('candidate-config').textContent='CANDIDATE\n'+JSON.stringify(report.config.candidate,null,2);
-for(const w of report.warnings)byId('warnings').append(el('li','',w));
-byId('policy').textContent='Policy: top-'+report.policy.k+' context chunks; allowed document-recall drop '+report.policy.max_recall_drop+' per query; reciprocal-rank gate '+(report.policy.max_mrr_drop===null?'disabled':report.policy.max_mrr_drop)+'. Gate: '+sum.gate+'.';
-let filter='all',search='';
-function side(raw,metrics,label,otherDocs){const col=el('div','');col.append(el('div','section-label',label));col.append(el('div','metric','Document recall '+fmt(metrics?.document_recall)+' · reciprocal rank '+fmt(metrics?.reciprocal_rank)));const funnel=el('div','funnel');for(const stage of raw.stages){const n=el('div','stage',stage.name);n.append(el('b','',String(stage.hits.length)));funnel.append(n)}col.append(funnel);const select=el('select','selected-stage');select.setAttribute('aria-label',label+' recorded stage');for(const stage of raw.stages){const option=el('option','',stage.name);option.value=stage.name;select.append(option)}select.value='context';col.append(select);const list=el('div','hit-list');col.append(list);function draw(){list.replaceChildren();const hits=raw.stages.find(s=>s.name===select.value).hits;if(!hits.length)list.append(el('p','explanation','No recorded hits.'));hits.forEach((hit,i)=>{const row=el('div','hit');const cls=select.value==='context'&&!otherDocs.has(hit.document_id)?(label==='BASELINE'?'lost':'gained'):'';row.append(el('code',cls,(i+1)+'. '+hit.document_id+' / '+hit.chunk_id));if(hit.score!==null&&hit.score!==undefined)row.append(el('small','',String(hit.score)));if(hit.text)row.append(el('p','',hit.text));list.append(row)})}select.addEventListener('change',draw);draw();return col}
-function card(q){const box=el('details','query');box.open=q.status==='regressed';box.dataset.queryId=q.query_id;const summary=el('summary','');const heading=el('div','qheading');heading.append(el('div','qid',q.query_id),el('div','qtitle',q.query));summary.append(heading,el('span','pill '+q.status,q.status.replaceAll('_',' ')));box.append(summary);const body=el('div','body');for(const d of q.diagnoses){const n=el('div','diagnosis');n.append(el('code','',d.document_id),el('p','',d.detail));if(d.recorded_reasons?.length)n.append(el('div','reason','Recorded reason: '+d.recorded_reasons.join('; ')));if(d.kind==='removed_between_stages'&&!d.reasons_complete)n.append(el('p','', 'Some removed chunks have no recorded reason.'));body.append(n)}if(q.lost_documents.length||q.gained_documents.length){body.append(el('p','explanation','Lost from top-'+report.policy.k+': '+(q.lost_documents.join(', ')||'none')+' · gained: '+(q.gained_documents.join(', ')||'none')))}const cols=el('div','columns');cols.append(side(q.baseline,q.baseline_metrics,'BASELINE',new Set(q.candidate.stages.at(-1).hits.map(h=>h.document_id))),side(q.candidate,q.candidate_metrics,'CANDIDATE',new Set(q.baseline.stages.at(-1).hits.map(h=>h.document_id))));body.append(cols);box.append(body);return box}
-function draw(){const visible=report.queries.filter(q=>(filter==='all'||(filter==='changed'?q.lost_documents.length||q.gained_documents.length:q.status===filter))&&JSON.stringify([q.query_id,q.query,q.lost_documents,q.gained_documents]).toLowerCase().includes(search));byId('queries').replaceChildren(...visible.map(card));if(!visible.length)byId('queries').append(el('div','empty','No matching queries.'));byId('count').textContent=visible.length+' of '+sum.queries+' queries'}
-for(const button of document.querySelectorAll('[data-filter]'))button.addEventListener('click',()=>{filter=button.dataset.filter;for(const b of document.querySelectorAll('[data-filter]'))b.setAttribute('aria-pressed',String(b===button));draw()});
-byId('search').addEventListener('input',e=>{search=e.target.value.toLowerCase();draw()});draw();
-</script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>Retrieval Diff — Evidence review</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #101412;
+        --panel: #181e1a;
+        --line: #303d33;
+        --muted: #a5b4aa;
+        --text: #eaf0eb;
+        --green: #b3ed9d;
+        --red: #ffac9a;
+        --blue: #a7cfff;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font:
+          15px/1.55 system-ui,
+          sans-serif;
+      }
+      main {
+        max-width: 1260px;
+        margin: auto;
+        padding: 38px 32px 70px;
+      }
+      a {
+        color: var(--green);
+      }
+      .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+      }
+      .brand {
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .brand span {
+        color: var(--green);
+      }
+      .badge {
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 5px 12px;
+        font-size: 12px;
+        white-space: nowrap;
+        color: var(--muted);
+      }
+      h1 {
+        font-size: clamp(32px, 5vw, 52px);
+        letter-spacing: -0.045em;
+        line-height: 1.13;
+        margin: 44px 0 14px;
+        font-weight: 600;
+      }
+      p {
+        color: var(--muted);
+        margin: 6px 0 20px;
+      }
+      .run {
+        font-family: ui-monospace, monospace;
+        font-size: 13px;
+        overflow-wrap: anywhere;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin: 30px 0;
+      }
+      .stat {
+        padding: 18px 22px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        border-radius: 12px;
+      }
+      .stat strong {
+        display: block;
+        font-size: 32px;
+        font-weight: 550;
+        line-height: 1.3;
+      }
+      .stat label {
+        font-size: 12px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+      }
+      .regressed {
+        color: var(--red);
+      }
+      .improved {
+        color: var(--green);
+      }
+      .controls {
+        display: flex;
+        gap: 12px;
+        justify-content: space-between;
+        margin: 32px 0 16px;
+      }
+      .tabs {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      button,
+      input,
+      select {
+        font: inherit;
+        border: 1px solid var(--line);
+        color: var(--text);
+        background: var(--panel);
+        border-radius: 7px;
+        padding: 8px 12px;
+      }
+      button {
+        cursor: pointer;
+      }
+      button[aria-pressed="true"] {
+        background: var(--green);
+        color: #172115;
+        border-color: var(--green);
+      }
+      button:focus-visible,
+      input:focus-visible,
+      summary:focus-visible {
+        outline: 2px solid var(--blue);
+        outline-offset: 3px;
+      }
+      input {
+        width: 280px;
+        max-width: 100%;
+      }
+      .query {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        margin: 12px 0;
+        background: var(--panel);
+        overflow: hidden;
+      }
+      .query > summary {
+        padding: 18px 20px;
+        cursor: pointer;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+      .query > summary::-webkit-details-marker {
+        display: none;
+      }
+      .query > summary:after {
+        content: "+";
+        color: var(--muted);
+      }
+      .query[open] > summary:after {
+        content: "−";
+      }
+      .qheading {
+        flex: 1;
+        min-width: 0;
+      }
+      .qid {
+        font:
+          12px ui-monospace,
+          monospace;
+        color: var(--muted);
+      }
+      .qtitle {
+        font-size: 16px;
+        overflow-wrap: anywhere;
+      }
+      .pill {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        padding: 3px 7px;
+        white-space: nowrap;
+      }
+      .body {
+        padding: 0 20px 24px;
+        border-top: 1px solid var(--line);
+      }
+      .columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      .section-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+        margin: 22px 0 10px;
+      }
+      .metric {
+        font:
+          13px ui-monospace,
+          monospace;
+        color: var(--muted);
+        margin: 8px 0;
+      }
+      .funnel {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .stage {
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 7px 10px;
+        font-size: 12px;
+      }
+      .stage b {
+        color: var(--green);
+        margin-left: 6px;
+      }
+      .diagnosis {
+        border-left: 2px solid var(--red);
+        padding: 8px 14px;
+        margin: 12px 0;
+        background: #211e19;
+      }
+      .diagnosis code {
+        color: var(--text);
+        overflow-wrap: anywhere;
+      }
+      .diagnosis p {
+        font-size: 13px;
+        margin: 4px 0;
+      }
+      .reason {
+        font:
+          12px ui-monospace,
+          monospace;
+        color: var(--red);
+        overflow-wrap: anywhere;
+      }
+      .hit {
+        padding: 12px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .hit code {
+        font-size: 12px;
+        overflow-wrap: anywhere;
+      }
+      .hit small {
+        color: var(--muted);
+        margin-left: 8px;
+      }
+      .hit p {
+        font-size: 13px;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        margin: 7px 0;
+      }
+      .lost {
+        color: var(--red);
+      }
+      .gained {
+        color: var(--green);
+      }
+      .notes {
+        border-top: 1px solid var(--line);
+        margin-top: 34px;
+        padding-top: 20px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .notes li {
+        margin: 8px 0;
+      }
+      .empty {
+        text-align: center;
+        padding: 36px;
+        color: var(--muted);
+      }
+      .config {
+        font:
+          12px ui-monospace,
+          monospace;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      .selected-stage {
+        margin-top: 18px;
+        width: 100%;
+      }
+      .explanation {
+        font-size: 13px;
+      }
+      .aggregate {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px 16px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .aggregate b {
+        color: var(--text);
+      }
+      @media (max-width: 720px) {
+        main {
+          padding: 24px 16px 50px;
+        }
+        .stats {
+          grid-template-columns: 1fr 1fr;
+        }
+        .columns {
+          grid-template-columns: 1fr;
+        }
+        .controls {
+          flex-direction: column;
+        }
+        .query > summary {
+          padding: 15px 12px;
+          gap: 8px;
+        }
+        .body {
+          padding: 0 12px 18px;
+        }
+        h1 {
+          margin-top: 32px;
+        }
+        .pill {
+          font-size: 9px;
+        }
+        .top {
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="top">
+        <div class="brand"><span>↳</span> Retrieval Diff</div>
+        <div class="badge">LOCAL REPORT · NO EXTERNAL ASSETS</div>
+      </div>
+      <h1>What changed.<br />Where evidence disappeared.</h1>
+      <p>Review retrieval changes before they reach your users.</p>
+      <div class="run" id="runs"></div>
+      <div class="stats" id="stats"></div>
+      <div class="aggregate" id="aggregate"></div>
+      <div class="controls">
+        <div class="tabs" role="group" aria-label="Filter queries">
+          <button data-filter="all" aria-pressed="true">All queries</button
+          ><button data-filter="regressed" aria-pressed="false">
+            Regressions</button
+          ><button data-filter="improved" aria-pressed="false">
+            Improvements</button
+          ><button data-filter="changed" aria-pressed="false">
+            Source changes
+          </button>
+        </div>
+        <input
+          type="search"
+          id="search"
+          aria-label="Search queries"
+          placeholder="Search queries or sources…"
+        />
+      </div>
+      <div id="count" class="qid" aria-live="polite"></div>
+      <section id="queries" aria-label="Query comparisons"></section>
+      <details class="notes">
+        <summary>Run configuration</summary>
+        <div class="columns">
+          <pre class="config" id="baseline-config"></pre>
+          <pre class="config" id="candidate-config"></pre>
+        </div>
+      </details>
+      <footer class="notes">
+        <b>Read the evidence, not just the score.</b>
+        <ul id="warnings"></ul>
+        <p id="policy"></p>
+        <p>
+          Scores are displayed as recorded; scores from different models or
+          stages are not assumed comparable. Stage lists must contain complete
+          observed results for the stages you record. This file includes the
+          query text and recorded excerpts.
+        </p>
+      </footer>
+    </main>
+    <script type="application/json" id="report-data">
+      __REPORT_DATA__
+    </script>
+    <script>
+      "use strict";
+      const report = JSON.parse(
+        document.getElementById("report-data").textContent,
+      );
+      const el = (tag, cls, text) => {
+        const n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text !== undefined) n.textContent = text;
+        return n;
+      };
+      const byId = (id) => document.getElementById(id);
+      const fmt = (n) =>
+        n === null || n === undefined ? "unlabeled" : n.toFixed(3);
+      const sum = report.summary;
+      byId("runs").textContent =
+        report.baseline_run_id +
+        " → " +
+        report.candidate_run_id +
+        "  /  " +
+        report.dataset_id;
+      for (const [value, label, cls] of [
+        [sum.queries, "Queries reviewed", ""],
+        [sum.regressed, "Regressions", "regressed"],
+        [sum.improved, "Improvements", "improved"],
+        [
+          sum.gate.toUpperCase(),
+          "Labeled quality gate",
+          sum.gate === "fail" ? "regressed" : "",
+        ],
+      ]) {
+        const box = el("div", "stat");
+        box.append(el("strong", cls, String(value)), el("label", "", label));
+        byId("stats").append(box);
+      }
+      const agg = report.aggregate;
+      byId("aggregate").textContent =
+        "Mean document recall: " +
+        fmt(agg.baseline?.document_recall) +
+        " → " +
+        fmt(agg.candidate?.document_recall) +
+        " · " +
+        sum.labeled +
+        "/" +
+        sum.queries +
+        " queries labeled. Individual regressions are checked separately.";
+      byId("baseline-config").textContent =
+        "BASELINE\n" + JSON.stringify(report.config.baseline, null, 2);
+      byId("candidate-config").textContent =
+        "CANDIDATE\n" + JSON.stringify(report.config.candidate, null, 2);
+      for (const w of report.warnings) byId("warnings").append(el("li", "", w));
+      byId("policy").textContent =
+        "Policy: top-" +
+        report.policy.k +
+        " context chunks; allowed document-recall drop " +
+        report.policy.max_recall_drop +
+        " per query; reciprocal-rank gate " +
+        (report.policy.max_mrr_drop === null
+          ? "disabled"
+          : report.policy.max_mrr_drop) +
+        ". Gate: " +
+        sum.gate +
+        ".";
+      let filter = "all",
+        search = "";
+      function side(raw, metrics, label, otherDocs) {
+        const col = el("div", "");
+        col.append(el("div", "section-label", label));
+        col.append(
+          el(
+            "div",
+            "metric",
+            "Document recall " +
+              fmt(metrics?.document_recall) +
+              " · reciprocal rank " +
+              fmt(metrics?.reciprocal_rank),
+          ),
+        );
+        const funnel = el("div", "funnel");
+        for (const stage of raw.stages) {
+          const n = el("div", "stage", stage.name);
+          n.append(el("b", "", String(stage.hits.length)));
+          funnel.append(n);
+        }
+        col.append(funnel);
+        const select = el("select", "selected-stage");
+        select.setAttribute("aria-label", label + " recorded stage");
+        for (const stage of raw.stages) {
+          const option = el("option", "", stage.name);
+          option.value = stage.name;
+          select.append(option);
+        }
+        select.value = "context";
+        col.append(select);
+        const list = el("div", "hit-list");
+        col.append(list);
+        function draw() {
+          list.replaceChildren();
+          const hits = raw.stages.find((s) => s.name === select.value).hits;
+          if (!hits.length)
+            list.append(el("p", "explanation", "No recorded hits."));
+          hits.forEach((hit, i) => {
+            const row = el("div", "hit");
+            const cls =
+              select.value === "context" && !otherDocs.has(hit.document_id)
+                ? label === "BASELINE"
+                  ? "lost"
+                  : "gained"
+                : "";
+            row.append(
+              el(
+                "code",
+                cls,
+                i + 1 + ". " + hit.document_id + " / " + hit.chunk_id,
+              ),
+            );
+            if (hit.score !== null && hit.score !== undefined)
+              row.append(el("small", "", String(hit.score)));
+            if (hit.text) row.append(el("p", "", hit.text));
+            list.append(row);
+          });
+        }
+        select.addEventListener("change", draw);
+        draw();
+        return col;
+      }
+      function card(q) {
+        const box = el("details", "query");
+        box.open = q.status === "regressed";
+        box.dataset.queryId = q.query_id;
+        const summary = el("summary", "");
+        const heading = el("div", "qheading");
+        heading.append(
+          el("div", "qid", q.query_id),
+          el("div", "qtitle", q.query),
+        );
+        summary.append(
+          heading,
+          el("span", "pill " + q.status, q.status.replaceAll("_", " ")),
+        );
+        box.append(summary);
+        const body = el("div", "body");
+        for (const d of q.diagnoses) {
+          const n = el("div", "diagnosis");
+          n.append(el("code", "", d.document_id), el("p", "", d.detail));
+          if (d.recorded_reasons?.length)
+            n.append(
+              el(
+                "div",
+                "reason",
+                "Recorded reason: " + d.recorded_reasons.join("; "),
+              ),
+            );
+          if (d.kind === "removed_between_stages" && !d.reasons_complete)
+            n.append(
+              el("p", "", "Some removed chunks have no recorded reason."),
+            );
+          body.append(n);
+        }
+        if (q.lost_documents.length || q.gained_documents.length) {
+          body.append(
+            el(
+              "p",
+              "explanation",
+              "Lost from top-" +
+                report.policy.k +
+                ": " +
+                (q.lost_documents.join(", ") || "none") +
+                " · gained: " +
+                (q.gained_documents.join(", ") || "none"),
+            ),
+          );
+        }
+        const cols = el("div", "columns");
+        cols.append(
+          side(
+            q.baseline,
+            q.baseline_metrics,
+            "BASELINE",
+            new Set(q.candidate.stages.at(-1).hits.map((h) => h.document_id)),
+          ),
+          side(
+            q.candidate,
+            q.candidate_metrics,
+            "CANDIDATE",
+            new Set(q.baseline.stages.at(-1).hits.map((h) => h.document_id)),
+          ),
+        );
+        body.append(cols);
+        box.append(body);
+        return box;
+      }
+      function draw() {
+        const visible = report.queries.filter(
+          (q) =>
+            (filter === "all" ||
+              (filter === "changed"
+                ? q.lost_documents.length || q.gained_documents.length
+                : q.status === filter)) &&
+            JSON.stringify([
+              q.query_id,
+              q.query,
+              q.lost_documents,
+              q.gained_documents,
+            ])
+              .toLowerCase()
+              .includes(search),
+        );
+        byId("queries").replaceChildren(...visible.map(card));
+        if (!visible.length)
+          byId("queries").append(el("div", "empty", "No matching queries."));
+        byId("count").textContent =
+          visible.length + " of " + sum.queries + " queries";
+      }
+      for (const button of document.querySelectorAll("[data-filter]"))
+        button.addEventListener("click", () => {
+          filter = button.dataset.filter;
+          for (const b of document.querySelectorAll("[data-filter]"))
+            b.setAttribute("aria-pressed", String(b === button));
+          draw();
+        });
+      byId("search").addEventListener("input", (e) => {
+        search = e.target.value.toLowerCase();
+        draw();
+      });
+      draw();
+    </script>
+  </body>
 </html>

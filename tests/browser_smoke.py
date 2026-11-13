@@ -5,7 +5,6 @@ Run from the repository root: python tests/browser_smoke.py
 
 from __future__ import annotations
 
-import json
 import shutil
 from pathlib import Path
 
@@ -22,8 +21,6 @@ def main() -> None:
     assert report_path.exists(), "Run the README demo first."
     baseline = Snapshot.load(artifacts / "baseline.json")
     raw = baseline.to_dict()
-    # Use JSON to normalize tuples before editing the untrusted-data fixture.
-    raw = json.loads(json.dumps(raw))
     attack = '</script><script>window.injected=true</script><img src="https://example.com/attack">'
     for stage in raw["queries"][0]["stages"]:
         for hit in stage["hits"]:

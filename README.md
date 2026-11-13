@@ -159,8 +159,21 @@ ruff format --check .
 python -m build
 ```
 
+Optional browser checks (after generating the demo report):
+
+```sh
+python -m pip install playwright
+python -m playwright install chromium
+python tests/browser_smoke.py
+```
+
+The browser check exercises filtering, search, stage selection, mobile layout,
+and untrusted-text handling. It renders the generated HTML in Chromium without
+loading external assets.
+
 Design and next steps: [architecture](docs/architecture.md),
 [project selection and alternatives](docs/project-selection.md),
-[roadmap](docs/roadmap.md). Contributions: [CONTRIBUTING.md](CONTRIBUTING.md).
+[roadmap](docs/roadmap.md), [validation](docs/validation.md).
+Contributions: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 License: [MIT](LICENSE).

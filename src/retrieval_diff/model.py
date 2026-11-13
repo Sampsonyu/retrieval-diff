@@ -236,7 +236,16 @@ class Snapshot:
             raise ValidationError(f"{path}: invalid UTF-8 JSON: {exc}") from exc
 
     def to_dict(self) -> dict:
-        return asdict(self)
+        raw = asdict(self)
+        raw["queries"] = list(raw["queries"])
+        for query in raw["queries"]:
+            if query["relevant_document_ids"] is not None:
+                query["relevant_document_ids"] = list(query["relevant_document_ids"])
+            query["stages"] = list(query["stages"])
+            for stage in query["stages"]:
+                stage["hits"] = list(stage["hits"])
+                stage["dropped"] = list(stage["dropped"])
+        return raw
 
     def save(self, path: str | Path) -> None:
         Path(path).write_text(
