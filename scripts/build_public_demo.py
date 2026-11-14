@@ -7,6 +7,9 @@ import json
 import shutil
 from pathlib import Path
 
+from retrieval_diff import Snapshot, compare
+from retrieval_diff.report import html_report
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -15,12 +18,21 @@ def build(output: Path) -> None:
     fixed = ROOT / "artifacts/fastapi-docs-fixed"
     measured = json.loads((broken / "measurements.json").read_text())
     corrected = json.loads((fixed / "measurements.json").read_text())
-    report = json.loads((broken / "report.json").read_text())
-    fixed_report = json.loads((fixed / "report.json").read_text())
+    report = compare(
+        Snapshot.load(broken / "baseline.json"), Snapshot.load(broken / "candidate.json"), k=3
+    )
+    fixed_report = compare(
+        Snapshot.load(fixed / "baseline.json"), Snapshot.load(fixed / "candidate.json"), k=3
+    )
     if measured["corpus_fingerprint"] != corrected["corpus_fingerprint"]:
         raise ValueError("Cannot publish comparisons across different corpora")
     if report["summary"]["gate"] != "fail" or fixed_report["summary"]["gate"] != "pass":
         raise ValueError("The demonstration must include a reproduced failure and corrected run")
+    for data, actual in ((measured, report), (corrected, fixed_report)):
+        if data["summary"] != actual["summary"] or data["aggregate"] != actual["aggregate"]:
+            raise ValueError(
+                "Measurements do not match the recorded snapshots; rerun the experiment"
+            )
     values = {
         "DOCS": measured["corpus_documents"],
         "CHUNKS": measured["chunks"],
@@ -37,12 +49,24 @@ def build(output: Path) -> None:
     output.mkdir(parents=True, exist_ok=True)
     (output / "index.html").write_text(html)
     (output / "reports").mkdir(exist_ok=True)
-    for source, target in (
-        (broken / "report.html", "fastapi-regression.html"),
-        (fixed / "report.html", "fastapi-fixed.html"),
-        (ROOT / "artifacts/demo/report.html", "synthetic.html"),
-    ):
-        shutil.copyfile(source, output / "reports" / target)
+    synthetic = compare(
+        Snapshot.load(ROOT / "artifacts/demo/baseline.json"),
+        Snapshot.load(ROOT / "artifacts/demo/candidate.json"),
+        k=1,
+    )
+    reports = {
+        "fastapi-regression.html": ("Failing public-docs run", report),
+        "fastapi-fixed.html": ("Corrected public-docs run", fixed_report),
+        "synthetic.html": ("Unchanged-average example", synthetic),
+    }
+    for target, (_, data) in reports.items():
+        links = [("Demo overview", "../index.html")]
+        links.extend(
+            (label, filename) for filename, (label, _) in reports.items() if filename != target
+        )
+        (output / "reports" / target).write_text(
+            html_report(data, navigation=links), encoding="utf-8"
+        )
     (output / "data").mkdir(exist_ok=True)
     for source, target in (
         (broken / "measurements.json", "measurements.json"),

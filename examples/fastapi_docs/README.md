@@ -10,10 +10,14 @@ incident, production application, or generated-answer benchmark. No LLM is calle
 From the repository root, with Python 3.12 or newer:
 
 ```sh
+python -m venv .venv
+. .venv/bin/activate
 python -m pip install -e . -r examples/fastapi_docs/requirements.txt
 python examples/fastapi_docs/run.py
 python examples/fastapi_docs/run.py --fixed --output artifacts/fastapi-docs-fixed
 ```
+
+On Windows PowerShell, activate with `.venv\Scripts\Activate.ps1` instead.
 
 Open `artifacts/fastapi-docs/report.html` and select **Regressions**. For either
 failed query, switch the candidate stage from `context` to `bm25_search`. The

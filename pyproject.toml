@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "retrieval-diff"
-version = "0.2.0"
+version = "0.2.1"
 description = "Find the recorded stage where RAG evidence disappeared."
 readme = "README.md"
 requires-python = ">=3.10"

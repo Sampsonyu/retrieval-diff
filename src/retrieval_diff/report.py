@@ -2,16 +2,46 @@
 
 from __future__ import annotations
 
+import html
 import json
+import re
+from collections.abc import Sequence
 from importlib.resources import files
+from urllib.parse import urlsplit
 
 
-def html_report(report: dict) -> str:
+def html_report(report: dict, *, navigation: Sequence[tuple[str, str]] = ()) -> str:
     # JSON lives in a non-executable script element. '<' must be escaped even
     # there: HTML parsers otherwise recognize user-supplied </script> sequences.
     payload = json.dumps(report, ensure_ascii=True, allow_nan=False).replace("<", "\\u003c")
     template = files("retrieval_diff").joinpath("report.html").read_text(encoding="utf-8")
-    return template.replace("__REPORT_DATA__", payload)
+    links = []
+    for label, href in navigation:
+        parsed = urlsplit(href)
+        if (
+            parsed.scheme not in ("", "https")
+            or (parsed.netloc and not parsed.scheme)
+            or "\\" in href
+            or any(ord(c) < 32 for c in href)
+            or href != href.strip()
+            or (parsed.scheme == "https" and not parsed.netloc)
+        ):
+            raise ValueError("Navigation URLs must be relative paths or absolute HTTPS URLs")
+        links.append(f'<a href="{html.escape(href, quote=True)}">{html.escape(label)}</a>')
+    nav = (
+        (
+            '<nav class="report-navigation" aria-label="Report navigation">'
+            + "".join(links)
+            + "</nav>"
+        )
+        if links
+        else ""
+    )
+    return re.sub(
+        r"__REPORT_DATA__|__REPORT_NAV__",
+        lambda match: payload if match[0] == "__REPORT_DATA__" else nav,
+        template,
+    )
 
 
 def markdown_report(report: dict) -> str:

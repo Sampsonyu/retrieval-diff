@@ -48,9 +48,15 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         inputs = {args.baseline.resolve(), args.candidate.resolve()}
         outputs = [p for p in (args.html, args.json, args.markdown) if p is not None]
+
+        def same_file(a: Path, b: Path) -> bool:
+            return a.resolve() == b.resolve() or (a.exists() and b.exists() and a.samefile(b))
+
         if len({p.resolve() for p in outputs}) != len(outputs):
             raise ValidationError("report output paths must be distinct")
-        if any(p.resolve() in inputs for p in outputs):
+        if any(same_file(a, b) for i, a in enumerate(outputs) for b in outputs[i + 1 :]):
+            raise ValidationError("report output paths must be distinct files")
+        if any(same_file(p, source) for p in outputs for source in inputs):
             raise ValidationError("a report must not overwrite an input snapshot")
         report = compare(
             Snapshot.load(args.baseline),

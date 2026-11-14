@@ -52,6 +52,7 @@ jobs:
           set -e
           test "$result" -eq 1
       - run: python tests/browser_smoke.py
+      - run: python tests/browser_regressions.py
       - uses: actions/upload-artifact@v4
         with:
           name: browser-screenshots

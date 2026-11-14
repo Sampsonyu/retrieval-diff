@@ -35,3 +35,12 @@ platform posts and invitations require a specific user instruction and known
 channel/account; do not infer posting authorization from drafting authorization.
 Preserve the distinction between observation, labeled quality, and unknown causes.
 All repository-facing content stays in English.
+
+## Bug-fix follow-up
+
+Version 0.2.1 fixes report source search, retained interaction state, top-k
+highlighting, mobile no-labels display, snapshot configuration isolation, input
+errors, and output hard-link protection. The public-demo builder regenerates
+reports from snapshots and adds navigation. See CHANGELOG.md and the new unit /
+browser regression tests. Do not treat these generated-report checks as hosted
+Site browser verification; Cloud desktop initialization remains unavailable.

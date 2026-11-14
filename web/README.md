@@ -3,8 +3,10 @@
 Live URL: https://retrieval-diff-demo.sampsonyu.chatgpt.site
 
 `index.html` is a buildless landing page. Numeric placeholders are filled from
-executed experiment measurements by `scripts/build_public_demo.py`. The reports
-are copied directly from the Python report generator, with their original data.
+executed experiment measurements by `scripts/build_public_demo.py`. Reports are
+regenerated from recorded snapshots using the current Python template and include
+links to the overview and companion cases. Measurements are checked against the
+snapshots before publication.
 No uploads, model calls, analytics, signup, or server application are needed.
 
 Rebuild from the repository root:

@@ -80,7 +80,7 @@
       }
       .stats {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 12px;
         margin: 30px 0;
       }
@@ -95,6 +95,29 @@
         font-size: 32px;
         font-weight: 550;
         line-height: 1.3;
+        overflow-wrap: anywhere;
+      }
+      .stat strong.gate-status {
+        font-size: clamp(17px, 2vw, 28px);
+      }
+      .report-navigation {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 22px;
+        margin-top: 22px;
+        font-size: 13px;
+      }
+      .cutoff {
+        border-top: 1px dashed var(--muted);
+        color: var(--muted);
+        padding-top: 10px;
+        font-size: 12px;
+      }
+      .stage[aria-pressed="true"] b {
+        color: inherit;
+      }
+      .hit.outside-cutoff {
+        opacity: 0.7;
       }
       .stat label {
         font-size: 12px;
@@ -178,6 +201,7 @@
         min-width: 0;
       }
       .qid {
+        overflow-wrap: anywhere;
         font:
           12px ui-monospace,
           monospace;
@@ -188,13 +212,14 @@
         overflow-wrap: anywhere;
       }
       .pill {
+        max-width: 45%;
         font-size: 11px;
         text-transform: uppercase;
         letter-spacing: 0.06em;
         border: 1px solid var(--line);
         border-radius: 4px;
         padding: 3px 7px;
-        white-space: nowrap;
+        white-space: normal;
       }
       .body {
         padding: 0 20px 24px;
@@ -202,7 +227,7 @@
       }
       .columns {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         gap: 20px;
       }
       .section-label {
@@ -358,9 +383,10 @@
   <body>
     <main>
       <div class="top">
-        <div class="brand"><span>↳</span> Retrieval Diff</div>
+        <div class="brand"><span>/</span> Retrieval Diff</div>
         <div class="badge">LOCAL REPORT · NO EXTERNAL ASSETS</div>
       </div>
+      __REPORT_NAV__
       <h1>What changed.<br />Where evidence disappeared.</h1>
       <p>Review retrieval changes before they reach your users.</p>
       <div class="run" id="runs"></div>
@@ -434,13 +460,24 @@
         [sum.regressed, "Regressions", "regressed"],
         [sum.improved, "Improvements", "improved"],
         [
-          sum.gate.toUpperCase(),
+          sum.gate === "not_evaluated"
+            ? "NO LABELS"
+            : sum.gate === "pass" && sum.labeled < sum.queries
+              ? "PARTIAL PASS"
+              : sum.gate.toUpperCase(),
           "Labeled quality gate",
           sum.gate === "fail" ? "regressed" : "",
         ],
       ]) {
         const box = el("div", "stat");
-        box.append(el("strong", cls, String(value)), el("label", "", label));
+        box.append(
+          el(
+            "strong",
+            label === "Labeled quality gate" ? cls + " gate-status" : cls,
+            String(value),
+          ),
+          el("label", "", label),
+        );
         byId("stats").append(box);
       }
       const agg = report.aggregate;
@@ -473,7 +510,8 @@
         ".";
       let filter = "all",
         search = "";
-      function side(raw, metrics, label, otherDocs) {
+      const state = new Map();
+      function side(raw, metrics, label, otherDocs, view) {
         const col = el("div", "");
         col.append(el("div", "section-label", label));
         col.append(
@@ -488,8 +526,23 @@
         );
         const funnel = el("div", "funnel");
         for (const stage of raw.stages) {
-          const n = el("div", "stage", stage.name);
+          const n = el("button", "stage", stage.name);
+          n.type = "button";
+          n.dataset.stage = stage.name;
+          n.setAttribute(
+            "aria-label",
+            label +
+              " stage " +
+              stage.name +
+              " (" +
+              stage.hits.length +
+              " hits)",
+          );
           n.append(el("b", "", String(stage.hits.length)));
+          n.addEventListener("click", () => {
+            select.value = stage.name;
+            select.dispatchEvent(new Event("change"));
+          });
           funnel.append(n);
         }
         col.append(funnel);
@@ -500,19 +553,37 @@
           option.value = stage.name;
           select.append(option);
         }
-        select.value = "context";
+        const stateKey =
+          label === "BASELINE" ? "baselineStage" : "candidateStage";
+        select.value = view[stateKey];
         col.append(select);
         const list = el("div", "hit-list");
         col.append(list);
         function draw() {
           list.replaceChildren();
+          for (const button of funnel.querySelectorAll("button"))
+            button.setAttribute(
+              "aria-pressed",
+              String(button.dataset.stage === select.value),
+            );
           const hits = raw.stages.find((s) => s.name === select.value).hits;
           if (!hits.length)
             list.append(el("p", "explanation", "No recorded hits."));
           hits.forEach((hit, i) => {
-            const row = el("div", "hit");
+            const outside = select.value === "context" && i >= report.policy.k;
+            if (outside && i === report.policy.k)
+              list.append(
+                el(
+                  "div",
+                  "cutoff",
+                  "Outside evaluation top-" + report.policy.k,
+                ),
+              );
+            const row = el("div", "hit" + (outside ? " outside-cutoff" : ""));
             const cls =
-              select.value === "context" && !otherDocs.has(hit.document_id)
+              select.value === "context" &&
+              !outside &&
+              !otherDocs.has(hit.document_id)
                 ? label === "BASELINE"
                   ? "lost"
                   : "gained"
@@ -530,13 +601,23 @@
             list.append(row);
           });
         }
-        select.addEventListener("change", draw);
+        select.addEventListener("change", () => {
+          view[stateKey] = select.value;
+          draw();
+        });
         draw();
         return col;
       }
       function card(q) {
+        if (!state.has(q.query_id))
+          state.set(q.query_id, {
+            open: q.status === "regressed",
+            baselineStage: "context",
+            candidateStage: "context",
+          });
+        const view = state.get(q.query_id);
         const box = el("details", "query");
-        box.open = q.status === "regressed";
+        box.open = view.open;
         box.dataset.queryId = q.query_id;
         const summary = el("summary", "");
         const heading = el("div", "qheading");
@@ -587,13 +668,25 @@
             q.baseline,
             q.baseline_metrics,
             "BASELINE",
-            new Set(q.candidate.stages.at(-1).hits.map((h) => h.document_id)),
+            new Set(
+              q.candidate.stages
+                .at(-1)
+                .hits.slice(0, report.policy.k)
+                .map((h) => h.document_id),
+            ),
+            view,
           ),
           side(
             q.candidate,
             q.candidate_metrics,
             "CANDIDATE",
-            new Set(q.baseline.stages.at(-1).hits.map((h) => h.document_id)),
+            new Set(
+              q.baseline.stages
+                .at(-1)
+                .hits.slice(0, report.policy.k)
+                .map((h) => h.document_id),
+            ),
+            view,
           ),
         );
         body.append(cols);
@@ -601,6 +694,8 @@
         return box;
       }
       function draw() {
+        for (const box of document.querySelectorAll(".query"))
+          state.get(box.dataset.queryId).open = box.open;
         const visible = report.queries.filter(
           (q) =>
             (filter === "all" ||
@@ -612,6 +707,15 @@
               q.query,
               q.lost_documents,
               q.gained_documents,
+              q.diagnoses.map((d) => d.document_id),
+              q.baseline.relevant_document_ids,
+              q.candidate.relevant_document_ids,
+              q.baseline.stages.flatMap((s) =>
+                s.hits.map((h) => h.document_id),
+              ),
+              q.candidate.stages.flatMap((s) =>
+                s.hits.map((h) => h.document_id),
+              ),
             ])
               .toLowerCase()
               .includes(search),
@@ -630,7 +734,7 @@
           draw();
         });
       byId("search").addEventListener("input", (e) => {
-        search = e.target.value.toLowerCase();
+        search = e.target.value.toLowerCase().trim();
         draw();
       });
       draw();

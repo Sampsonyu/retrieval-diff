@@ -61,9 +61,11 @@ def compare(
     if type(k) is not int or k < 1:
         raise ValidationError("k must be a positive integer")
     for name, value in (("max_recall_drop", max_recall_drop), ("max_mrr_drop", max_mrr_drop)):
-        if value is not None and (
-            type(value) not in (int, float) or not math.isfinite(value) or not 0 <= value <= 1
-        ):
+        if name == "max_mrr_drop" and value is None:
+            continue
+        # Check the bounded interval before converting large Python integers to
+        # floats; math.isfinite(10**1000) itself raises OverflowError.
+        if type(value) not in (int, float) or not 0 <= value <= 1 or not math.isfinite(value):
             raise ValidationError(f"{name} must be a finite number between 0 and 1")
     for field in ("corpus_fingerprint", "dataset_id"):
         if getattr(baseline, field) != getattr(candidate, field):

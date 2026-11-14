@@ -135,7 +135,7 @@ class Snapshot:
         if not isinstance(config, dict):
             raise ValidationError("snapshot.config: expected an object")
         try:
-            json.dumps(config, allow_nan=False)
+            config = json.loads(json.dumps(config, allow_nan=False))
         except (ValueError, TypeError) as exc:
             raise ValidationError(f"snapshot.config: invalid JSON: {exc}") from exc
         queries = tuple(
@@ -232,7 +232,9 @@ class Snapshot:
             return cls.from_dict(
                 json.loads(Path(path).read_text(encoding="utf-8"), object_pairs_hook=unique_keys)
             )
-        except (json.JSONDecodeError, UnicodeError) as exc:
+        except ValidationError:
+            raise
+        except (ValueError, UnicodeError) as exc:
             raise ValidationError(f"{path}: invalid UTF-8 JSON: {exc}") from exc
 
     def to_dict(self) -> dict:

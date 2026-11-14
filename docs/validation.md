@@ -1,5 +1,18 @@
 # First-version validation
 
+## 0.2.1 regression validation
+
+New regression cases reproduced source-search omissions, lost expansion/stage
+state, top-k highlight errors, and unlabeled mobile overflow in the generated
+report. Each now has a browser assertion in `tests/browser_regressions.py`.
+API/CLI checks additionally cover mutable configuration snapshots, invalid policy
+values, oversized JSON integers, and hard-linked output paths. Public-demo tests
+cover regenerating reports from snapshots and rejecting stale measurements.
+
+The expanded suite contains 38 tests when example dependencies are installed.
+These core/report checks do not establish interactive verification of the hosted
+Site, whose browser access remains blocked by the Cloud desktop environment.
+
 ## Public-document integration update
 
 The optional LangChain/BM25 example executes against 12 pinned, licensed FastAPI
